@@ -23,28 +23,28 @@ I've developed a SPA for managing meter reading schedules to optimize operations
 ### Use Case Digrams
 #### General System
 
-![](eadme_images/2.png)
+![](Readme_images/2.png)
 
 
 #### Superior Admin
 
-![](eadme_images/5.png)
+![](Readme_images/5.png)
 
 #### Normal Admin
 
-![](eadme_images/6.png)
+![](Readme_images/6.png)
 
 #### Normal User
 
-![](eadme_images/7.png)
+![](Readme_images/7.png)
 
 ### Sequence Digram
 
-![](eadme_images/3.png)
+![](Readme_images/3.png)
 
 ### Class Digrams
 
-![](eadme_images/4.png)
+![](Readme_images/4.png)
 
 ## Installation
 
