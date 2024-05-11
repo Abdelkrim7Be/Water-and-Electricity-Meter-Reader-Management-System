@@ -1,5 +1,5 @@
 
-# Electricyty And Water Meter Reading Scheduling
+# Electricity And Water Meter Reading Scheduling
 
 I've developed a SPA for managing meter reading schedules to optimize operations related to meter reading. By using Vue.js and Laravel, I've built an interactive and responsive user interface, along with advanced database management. Following the Merise methodology, I ensured a clear and structured modeling of data and processes. Now, Admins can easily view the current month's meter readings, and I've implemented a flexible and dynamic access control system. Overall, I designed this application to provide a user-friendly solution that perfectly meets the specific needs of the company RADEM where i did my 2 months Intership
 
