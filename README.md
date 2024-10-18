@@ -76,7 +76,7 @@ npm install -g concurrently
 
 ## Usage
 
-Once the project is set up and the development servers are running, you can access the application by opening your web browser and navigating to the appropriate URL. Typically, this will be http://localhost:8000 for the Laravel backend and http://localhost:8080 for the Vue.js frontend.
+Once the project is set up and the development servers are running, you can access the application by opening your web browser and navigating to the appropriate URL. Typically, this will be http://localhost:8000 for the Laravel backend and http://localhost:8080 for the Vue.js frontend.Which means you could just type http://127.0.0.1:8000 and it will work
 
 ## Tech Stack
 
