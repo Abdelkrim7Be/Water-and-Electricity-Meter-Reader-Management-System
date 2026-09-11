@@ -28,3 +28,7 @@ public/admin.html
 # Contains real user data - keep local only, use releve.sql.example instead
 releve.sql
 api_token
+
+# User-uploaded content, not source - keep local only
+/public/uploads/*
+!/public/uploads/.gitkeep
