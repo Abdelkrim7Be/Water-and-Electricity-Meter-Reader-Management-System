@@ -7,7 +7,7 @@
 
     <title>La relève</title>
 
-    <link rel="stylesheet" href="/css/all.css">
+    @vite('resources/js/app.js')
     <script>
         (function() {
             window.Laravel = {
@@ -22,8 +22,8 @@
     <div id="app">
         @if (Auth::check())
             <script>
-                window.authUser = {!! json_encode(Auth::user()) !!};
-                window.permissions = {!! json_encode(Auth::user()->role->permission) !!};
+                window.authUser = {{ Illuminate\Support\Js::from(Auth::user()->only(['id', 'fullName', 'userType'])) }};
+                window.permissions = {{ Illuminate\Support\Js::from(Auth::user()->role?->permission) }};
             </script>
         @else
             <script>
@@ -33,6 +33,6 @@
     </div>
 </body>
 
-<script src="{{ mix('/js/app.js') }}"></script>
+
 
 </html>

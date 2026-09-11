@@ -175,7 +175,7 @@
                                         v-if="isDeletePermitted"
                                     >
                                         Supprimer
-                                    </button>   
+                                    </button>
                                 </td>
                             </tr>
                             <!-- ITEMS -->
@@ -418,33 +418,8 @@ export default {
             }
         },
         async fetchData() {
-            try {
-                const releveurs = await this.callApi(
-                    "get",
-                    "/app/get_releveur"
-                );
-                const plannings = await this.callApi("get", "/app/get_plan");
-                const users = await this.callApi("get", "/app/get_users");
-
-                this.releveursCount = releveurs.data.data.length;
-                this.planningsCount = plannings.data.data.length;
-
-                let countAdmins = 0;
-                let countUsers = 0;
-
-                users.data.data.forEach((user) => {
-                    if (user.userType === "User") {
-                        countUsers++;
-                    } else {
-                        countAdmins++;
-                    }
-                });
-
-                this.countAdmins = countAdmins;
-                this.countUsers = countUsers;
-            } catch (error) {
-                console.error(error);
-            }
+            const res = await this.callApi('get', '/app/stats');
+            if (res.status === 200) Object.assign(this, res.data);
         },
         async addReleveur() {
             if (
@@ -589,7 +564,7 @@ export default {
                 isDeleted: false,
             };
             this.$store.commit("setDeletingModalObj", deleteModalObj);
-            console.log("delete method called");
+
             this.fetchData();
         },
 
@@ -626,11 +601,14 @@ export default {
                 // console.log(this.$refs.uploads);
                 this.$refs.uploads.clearFiles();
             }
+            // Existing portraits remain attached until the edited record is saved.
+            if (!isAdd && this.releveurs[this.index]?.iconImage === image) return;
             const res = await this.callApi("post", "/app/delete_image", {
                 imageName: image,
             });
             if (res.status != 200) {
-                this.data.iconImage = image;
+                if (isAdd) this.data.iconImage = image;
+                else this.editData.iconImage = image;
                 this.swr();
             }
             // this.swr();

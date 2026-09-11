@@ -32,3 +32,17 @@ api_token
 # User-uploaded content, not source - keep local only
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# Generated assets and local databases
+/public/build/
+/public/js/
+/public/css/
+/public/fonts/
+/public/images/
+/public/mix-manifest.json
+*.sql
+*.sqlite
+*.sqlite3
+*.log
+/docs/screenshots/raw/
+!/database/schema/mysql-schema.sql

@@ -364,33 +364,8 @@ export default {
             // the problem is the delay, which is annoying
         },
         async fetchData() {
-            try {
-                const releveurs = await this.callApi(
-                    "get",
-                    "/app/get_releveur"
-                );
-                const plannings = await this.callApi("get", "/app/get_plan");
-                const users = await this.callApi("get", "/app/get_users");
-
-                this.releveursCount = releveurs.data.data.length;
-                this.planningsCount = plannings.data.data.length;
-
-                let countAdmins = 0;
-                let countUsers = 0;
-
-                users.data.data.forEach((user) => {
-                    if (user.userType === "User") {
-                        countUsers++;
-                    } else {
-                        countAdmins++;
-                    }
-                });
-
-                this.countAdmins = countAdmins;
-                this.countUsers = countUsers;
-            } catch (error) {
-                console.error(error);
-            }
+            const res = await this.callApi('get', '/app/stats');
+            if (res.status === 200) Object.assign(this, res.data);
         },
         async addAdmin() {
             if (
@@ -464,9 +439,7 @@ export default {
                 this.users[this.index].fullName = this.editData.fullName;
                 this.users[this.index].email = this.editData.email;
                 this.users[this.index].role_id = this.editData.role_id;
-                if (this.editData.password) {
-                    this.users[this.index].password = this.editData.password;
-                }
+
                 this.s("La modification a été effectuée avec succès");
                 this.editModal = false;
                 this.fetchData();
@@ -523,7 +496,7 @@ export default {
                 isDeleted: false,
             };
             this.$store.commit("setDeletingModalObj", deleteModalObj);
-            console.log("delete method called");
+
         },
 
         closeEditModal() {
