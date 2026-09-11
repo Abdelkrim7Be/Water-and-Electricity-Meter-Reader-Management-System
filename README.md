@@ -1,92 +1,124 @@
+<div align="center">
 
-# Electricity And Water Meter Reading Scheduling
+# Gestion des Relevés de Compteurs Eau & Électricité
 
-I've developed a SPA for managing meter reading schedules to optimize operations related to meter reading. By using Vue.js and Laravel, I've built an interactive and responsive user interface, along with advanced database management. Following the Merise methodology, I ensured a clear and structured modeling of data and processes. Now, Admins can easily view the current month's meter readings, and I've implemented a flexible and dynamic access control system. Overall, I designed this application to provide a user-friendly solution that perfectly meets the specific needs of the company RADEM where i did my 2 months Intership
+Application SPA de planification et de suivi des relevés de compteurs, développée durant un stage de 2 mois chez **RADEM**.
 
-## Roadmap
+![License](https://img.shields.io/badge/license-MIT-green)
+![PHP](https://img.shields.io/badge/PHP-8.1-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-10-FF2D20?logo=laravel&logoColor=white)
+![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)
 
-- System Actors
-- Design/Modeling
-    - Use Case diagrams
-    - Sequence Diagram
-    - Class Diagram
-- Installation
-- Usage
-- License
+</div>
 
-## System Actors
+## Sommaire
 
-![](Readme_images/1.png)
+- [Aperçu](#aperçu)
+- [Fonctionnalités](#fonctionnalités)
+- [Stack technique](#stack-technique)
+- [Acteurs du système](#acteurs-du-système)
+- [Conception / Modélisation](#conception--modélisation)
+- [Installation](#installation)
+- [Utilisation](#utilisation)
+- [Licence](#licence)
 
-## Design / Modeling
+## Aperçu
 
-### Use Case Digrams
-#### General System
+Ce projet a pour but de digitaliser et d'optimiser la planification des relevés de compteurs d'eau et d'électricité. Développée avec **Vue.js** en frontend et **Laravel** en backend, l'application propose une interface interactive et responsive, appuyée par une modélisation des données et des processus suivant la méthode **Merise**.
 
-![](Readme_images/2.png)
+Les administrateurs peuvent consulter les relevés du mois en cours, gérer les plannings des releveurs, et l'accès aux différentes fonctionnalités est contrôlé par un système de rôles dynamique et flexible. L'application a été pensée pour répondre précisément aux besoins opérationnels de RADEM.
 
+## Fonctionnalités
 
-#### Superior Admin
+- Planification et suivi des tournées de relevé
+- Tableau de bord admin avec vue mensuelle des relevés
+- Système de rôles et permissions dynamique (Super Admin, Admin, Releveur, Utilisateur)
+- Historique des relevés par compteur
+- Interface SPA réactive (Vue Router + Vuex)
+- Authentification API via Laravel Sanctum
 
-![](Readme_images/5.png)
+## Stack technique
 
-#### Normal Admin
+| Côté | Technologies |
+| --- | --- |
+| **Frontend** | Vue 3, Vue Router, Vuex, Bootstrap 5, Tailwind CSS |
+| **Backend** | Laravel 10, PHP 8.1, Laravel Sanctum |
+| **Base de données** | MySQL |
 
-![](Readme_images/6.png)
+## Acteurs du système
 
-#### Normal User
+![Acteurs du système](Readme_images/1.png)
 
-![](Readme_images/7.png)
+## Conception / Modélisation
 
-### Sequence Digram
+### Diagrammes de cas d'utilisation
 
-![](Readme_images/3.png)
+#### Système global
 
-### Class Digrams
+![Diagramme de cas d'utilisation général](Readme_images/2.png)
 
-![](Readme_images/4.png)
+#### Super Admin
+
+![Diagramme de cas d'utilisation Super Admin](Readme_images/5.png)
+
+#### Admin
+
+![Diagramme de cas d'utilisation Admin](Readme_images/6.png)
+
+#### Utilisateur
+
+![Diagramme de cas d'utilisation Utilisateur](Readme_images/7.png)
+
+### Diagramme de séquence
+
+![Diagramme de séquence](Readme_images/3.png)
+
+### Diagramme de classes
+
+![Diagramme de classes](Readme_images/4.png)
 
 ## Installation
 
-To run this project locally, follow these steps:
+1. Cloner le dépôt :
+   ```bash
+   git clone https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System.git
+   ```
+2. Se placer dans le dossier du projet.
+3. Installer les dépendances :
 
-1. Clone this repository.
-2. Navigate to the project directory.
-3. Install dependencies:
-For frontend:
-```bash
-  npm install
-```
-For backend:
-```bash
-  composer install
-```
-4. Set up your environment variables.
-5. Import the database script (if provided).
-6. If you plan to run both frontend and backend servers concurrently during development, install concurrently globally or as a dev dependency:
+   Frontend :
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install -g concurrently
-```
-7. Run the following commands to compile assets and start the development servers:
-```bash
-  npm run dev
-```
+   Backend :
+   ```bash
+   composer install
+   ```
+4. Configurer les variables d'environnement (copier `.env.example` vers `.env` et adapter les accès base de données).
+5. Générer la clé d'application :
+   ```bash
+   php artisan key:generate
+   ```
+6. Importer la base de données : dupliquer `releve.sql.example` en `releve.sql` (données factices) et l'importer dans MySQL, ou utiliser votre propre jeu de données.
+7. Installer `concurrently` pour lancer frontend et backend en parallèle :
+   ```bash
+   npm install -g concurrently
+   ```
+8. Compiler les assets et démarrer les serveurs de développement :
+   ```bash
+   npm run dev
+   ```
 
+## Utilisation
 
-## Usage
+Une fois les serveurs lancés, l'application est accessible via votre navigateur :
 
-Once the project is set up and the development servers are running, you can access the application by opening your web browser and navigating to the appropriate URL. Typically, this will be http://localhost:8000 for the Laravel backend and http://localhost:8080 for the Vue.js frontend.Which means you could just type http://127.0.0.1:8000 and it will work
+- Backend Laravel : `http://localhost:8000` (ou `http://127.0.0.1:8000`)
+- Frontend Vue.js : `http://localhost:8080`
 
-## Tech Stack
+## Licence
 
-**Client:** Vue, Bootstrap
-
-**Server:** Laravel, MySQL
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-
-
+Distribué sous licence [MIT](LICENSE).

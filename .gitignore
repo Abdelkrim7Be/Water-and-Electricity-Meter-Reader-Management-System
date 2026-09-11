@@ -24,3 +24,7 @@ public/dist/
 .idea/
 public/index.html
 public/admin.html
+
+# Contains real user data - keep local only, use releve.sql.example instead
+releve.sql
+api_token
