@@ -5,8 +5,8 @@
 Application SPA de planification et de suivi des relevés de compteurs, développée durant un stage de 2 mois chez **RADEM**.
 
 ![License](https://img.shields.io/badge/license-MIT-green)
-![PHP](https://img.shields.io/badge/PHP-8.1-777BB4?logo=php&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-10-FF2D20?logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
 ![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)
@@ -44,7 +44,7 @@ Les administrateurs peuvent consulter les relevés du mois en cours, gérer les 
 | Côté | Technologies |
 | --- | --- |
 | **Frontend** | Vue 3, Vue Router, Vuex, Bootstrap 5, Tailwind CSS |
-| **Backend** | Laravel 10, PHP 8.1, Laravel Sanctum |
+| **Backend** | Laravel 12, PHP 8.3, Laravel Sanctum |
 | **Base de données** | MySQL |
 
 ## Acteurs du système
@@ -81,7 +81,7 @@ Les administrateurs peuvent consulter les relevés du mois en cours, gérer les 
 
 ## Installation
 
-Prérequis : PHP 8.1 ou 8.2 pour les dépendances verrouillées, Composer, Node.js/npm et MySQL. Le fichier `composer.lock` actuel contient des dépendances incompatibles avec PHP 8.3.
+Prérequis : PHP 8.3+, Composer, Node.js 20/npm et MySQL.
 
 1. Cloner le dépôt :
    ```bash
