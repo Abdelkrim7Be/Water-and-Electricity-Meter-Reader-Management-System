@@ -1,142 +1,186 @@
 <div align="center">
 
-# Gestion des Relevés de Compteurs Eau & Électricité
+# Meter Reading Management
 
-Application SPA de planification et de suivi des relevés de compteurs, développée durant un stage de 2 mois chez **RADEM**.
+Plan and manage water and electricity meter-reading operations, with reader assignments, role-based access, and activity history.
 
-![License](https://img.shields.io/badge/license-MIT-green)
-![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)
-![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vuedotjs&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)
+[![CI](https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System/actions/workflows/ci.yml/badge.svg)](https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+![PHP](https://img.shields.io/badge/PHP_8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel_12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue_3-42B883?style=for-the-badge&logo=vuedotjs&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap_5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+
+[Overview](#overview) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Local setup](#local-setup) · [Checks](#checks)
 
 </div>
 
-## Sommaire
+## Overview
 
-- [Aperçu](#aperçu)
-- [Fonctionnalités](#fonctionnalités)
-- [Stack technique](#stack-technique)
-- [Acteurs du système](#acteurs-du-système)
-- [Conception / Modélisation](#conception--modélisation)
-- [Installation](#installation)
-- [Utilisation](#utilisation)
-- [Licence](#licence)
+A French-language application for organizing meter-reading rounds: assign field readers, define reading periods and route ranges, track planned workloads, and review changes. Administrators manage accounts and configure read, create, update, and delete permissions for each resource.
 
-## Aperçu
+The project began during a two-month internship at **RADEM**, using Merise for the original analysis and modeling. This repository contains the application source, a reproducible synthetic demo, tests, and deployment notes.
 
-Ce projet a pour but de digitaliser et d'optimiser la planification des relevés de compteurs d'eau et d'électricité. Développée avec **Vue.js** en frontend et **Laravel** en backend, l'application propose une interface interactive et responsive, appuyée par une modélisation des données et des processus suivant la méthode **Merise**.
+## Features
 
-Les administrateurs peuvent consulter les relevés du mois en cours, gérer les plannings des releveurs, et l'accès aux différentes fonctionnalités est contrôlé par un système de rôles dynamique et flexible. L'application a été pensée pour répondre précisément aux besoins opérationnels de RADEM.
-
-## Fonctionnalités
-
-- Planification et suivi des tournées de relevé
-- Tableau de bord admin avec vue mensuelle des relevés
-- Système de rôles et permissions dynamique (Super Admin, Admin, Releveur, Utilisateur)
-- Historique des relevés par compteur
-- Interface SPA réactive (Vue Router + Vuex)
-- Authentification API via Laravel Sanctum
-
-## Stack technique
-
-| Côté | Technologies |
+| Area | Capabilities |
 | --- | --- |
-| **Frontend** | Vue 3, Vue Router, Vuex, Bootstrap 5, Tailwind CSS |
-| **Backend** | Laravel 12, PHP 8.3, Laravel Sanctum |
-| **Base de données** | MySQL |
+| Planning | Reader assignments, dates, route ranges, reading order, estimated meter counts, and duration |
+| Field readers | Reader directory, contact details, portraits, and related plans |
+| Accounts | Administrator and viewer accounts linked to configurable roles |
+| Permissions | Resource-level permissions enforced by Laravel and reflected in the interface |
+| History | Creation, modification, and deletion history for reading plans |
+| Dashboard | Aggregate record counts and paginated management screens |
 
-## Acteurs du système
+## Screenshots
 
-![Acteurs du système](Readme_images/1.png)
+Captured from the running application using a separate database containing **synthetic records only**. Identity fields are replaced and blurred before capture; portraits use a blurred generic avatar. [Capture procedure](docs/screenshots/README.md).
 
-## Conception / Modélisation
+**Reading plans:** monthly assignments, workload, and route ranges.
 
-### Diagrammes de cas d'utilisation
+![Monthly reading plans with identity fields concealed](docs/screenshots/planning.png)
 
-#### Système global
+<details>
+<summary><strong>Reader directory and role permissions</strong></summary>
 
-![Diagramme de cas d'utilisation général](Readme_images/2.png)
+**Reader directory:** personal fields and portraits concealed.
 
-#### Super Admin
+![Reader directory with names, contact details, and portraits concealed](docs/screenshots/readers.png)
 
-![Diagramme de cas d'utilisation Super Admin](Readme_images/5.png)
+**Role permissions:** configure access to each management area.
 
-#### Admin
+![Resource permissions for the demonstration administrator role](docs/screenshots/permissions.png)
 
-![Diagramme de cas d'utilisation Admin](Readme_images/6.png)
+</details>
 
-#### Utilisateur
+## Architecture
 
-![Diagramme de cas d'utilisation Utilisateur](Readme_images/7.png)
+```mermaid
+flowchart LR
+    Browser[Browser] -->|Page request| Laravel[Laravel 12]
+    Laravel -->|Blade shell + Vite assets| SPA[Vue 3 SPA]
+    SPA --> Router[Vue Router · lazy-loaded pages]
+    SPA --> Store[Vuex · UI state]
+    SPA -->|Same-origin JSON + CSRF| Routes[Laravel web routes]
+    Routes --> Access[Session authentication + role permissions]
+    Access --> Controller[Controllers + validation]
+    Controller --> ORM[Eloquent]
+    ORM --> DB[(MySQL)]
+    Controller --> Files[Private portrait storage]
+    Files -->|Permission-checked image response| Browser
+```
 
-### Diagramme de séquence
+Laravel serves the page shell and JSON endpoints from the same origin. Authentication uses Laravel sessions and CSRF protection; Sanctum is installed for API-token integration. The current SPA uses session cookies. Vite builds production assets and provides hot reload during development.
 
-![Diagramme de séquence](Readme_images/3.png)
+The data model centers on **roles → users**, **readers → reading plans**, **periods → reading plans**, and **plans → history**. Some legacy relationships use reader serial numbers and actor names rather than foreign-key IDs. See [architecture and deployment notes](docs/architecture.md) for the boundaries and limitations, and [original design diagrams](docs/design.md) for the internship modeling.
 
-### Diagramme de classes
+```text
+app/                    Controllers, middleware, models, and Artisan commands
+config/                 Application configuration
+resources/js/           Vue pages, shared components, router, and store
+resources/css/          Source styles
+resources/views/        Blade page shell
+routes/                 HTTP routes
+database/schema/       MySQL baseline without personal records
+tests/                 Authentication and security regression tests
+docs/                  Architecture, modeling, and sanitized screenshots
+.github/workflows/     Build, test, dependency, and secret checks
+```
 
-![Diagramme de classes](Readme_images/4.png)
+## Local setup
 
-## Installation
+**Requirements:** PHP 8.3+ with PDO MySQL, mbstring, DOM, and fileinfo; Composer; Node.js 20.19+ or 22.12+; and MySQL 8. The current development setup was checked with PHP 8.3 and Node.js 20.
 
-Prérequis : PHP 8.3+, Composer, Node.js 20/npm et MySQL.
+```bash
+git clone https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System.git
+cd Water-and-Electricity-Meter-Reader-Management-System
+cp .env.example .env
+composer install
+npm ci
+php artisan key:generate
+```
 
-1. Cloner le dépôt :
-   ```bash
-   git clone https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System.git
-   ```
-2. Se placer dans le dossier du projet.
-3. Installer les dépendances :
+Set the database connection in `.env`:
 
-   Frontend :
-   ```bash
-   npm install
-   ```
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=releve
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-   Backend :
-   ```bash
-   composer install
-   ```
-4. Copier la configuration locale :
-   ```bash
-   cp .env.example .env
-   ```
-   Dans `.env`, utiliser `DB_DATABASE=releve` et les identifiants de votre serveur MySQL :
-   ```dotenv
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=releve
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
-   Laisser `DB_PASSWORD` vide si MySQL n'a pas de mot de passe, ou mettre `DB_PASSWORD=root` si le mot de passe local est `root`.
-   Après une modification de `.env`, vider le cache de configuration avec `php artisan config:clear`.
-5. Générer la clé d'application :
-   ```bash
-   php artisan key:generate
-   ```
-6. Pour une nouvelle installation, créer une base vide et importer les données factices :
-   ```bash
-   mysql -h 127.0.0.1 -u root -p -e "CREATE DATABASE releve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   mysql -h 127.0.0.1 -u root -p releve < releve.sql.example
-   ```
-   À l'invite, saisir le mot de passe MySQL (ou appuyer sur Entrée s'il est vide).
-   Ne pas importer ce fichier dans une base déjà utilisée. Les mots de passe des comptes d'exemple sont des valeurs factices : définir un mot de passe local avant de se connecter.
-7. Compiler les assets et démarrer Laravel (`concurrently` est déjà inclus dans les dépendances npm) :
-   ```bash
-   npm run dev
-   ```
+Use the password configured on your own MySQL server. For a local installation using `root` as its password, set `DB_PASSWORD=root`; leave it empty only if the server accepts an empty password. After changing configuration, run `php artisan config:clear`.
 
-## Utilisation
+For HTTPS deployment, set `APP_URL` to the HTTPS origin, set `CORS_ALLOWED_ORIGINS` to the exact allowed origins, and enable `SESSION_SECURE_COOKIE=true`. Do not use a wildcard CORS origin for authenticated deployments.
 
-Ouvrir **http://localhost:8000**. Laravel sert aussi l'interface Vue.js ; `npm run dev` compile les assets avec Laravel Mix et démarre le serveur PHP.
+### New demo installation
 
-Pour recompiler automatiquement les assets pendant les modifications, lancer `npm run watch` dans un autre terminal.
+Create an **empty** database, then initialize the schema and synthetic records:
 
-Si MySQL refuse la connexion, vérifier les mêmes identifiants avec `mysql -h 127.0.0.1 -u root -p`, puis corriger `.env` et exécuter `php artisan config:clear`.
+```bash
+mysql -h 127.0.0.1 -u root -p -e "CREATE DATABASE releve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+php artisan demo:setup
+```
 
-## Licence
+At the MySQL prompt, enter your database password, or press Enter if it is empty. `demo:setup` prints the demo admin email and a newly generated password. Save that password locally. There is no shared password committed to this repository.
 
-Distribué sous licence [MIT](LICENSE).
+The command only runs in `local` or `testing`, requires MySQL, and refuses a database that already contains tables. It loads the schema baseline and generates demo roles, users, readers, current-month plans, and history.
+
+### Existing installation
+
+Keep your database and existing `.env`. Install the updated dependencies, then migrate legacy portraits into private storage:
+
+```bash
+php artisan uploads:privatize
+php artisan config:clear
+npm run build
+```
+
+Do not run demo setup against existing operational data. See the [upgrade and deployment notes](docs/architecture.md#deployment-and-upgrades).
+
+### Run the application
+
+```bash
+npm run dev
+```
+
+Open **http://localhost:8000**. This command starts Laravel and Vite; use Laravel's URL to access the app.
+
+To serve a production build locally:
+
+```bash
+npm run build
+php artisan serve
+```
+
+## Checks
+
+```bash
+php artisan test
+composer validate --strict
+composer audit
+npm audit
+npm run build
+python3 scripts/check_repository.py
+```
+
+[CI](https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System/actions/workflows/ci.yml) also initializes an empty MySQL demo database, verifies that rerunning setup is rejected, checks configuration caching, and scans reachable Git history with Gitleaks. Dependency updates are monitored by Dependabot.
+
+## Repository hygiene and performance
+
+- Generated assets, dependencies, local configuration, logs, database exports, and uploaded files stay outside Git.
+- Vite replaces the legacy Webpack/Mix toolchain; route pages are loaded on demand and production source maps are disabled.
+- Dashboard counts come from aggregate queries instead of downloading account and reader records. Paginated endpoints accept at most 100 records per page.
+- Portraits require authentication and read permission. Password hashes and recovery codes are excluded from user JSON.
+- The demo contains no original user records or reusable credentials. Screenshots are reviewed separately from automated secret scanning.
+
+For reporting concerns and handling previously exposed credentials, see [SECURITY.md](SECURITY.md). For changes to the project, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+Source code is distributed under the [MIT license](LICENSE). The RADEM name and logo identify the internship context; their inclusion does not imply endorsement or grant trademark rights.

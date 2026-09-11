@@ -40,31 +40,16 @@ class AdminController extends Controller
 
     public function checkForPermission($user, $request)
     {
-        // decode the stringfy json into a real json
-        $permission = json_decode($user->role->permission);
-
-        $hasPermission = false;
-        if (!$permission)
-            return view('welcome');
-        foreach ($permission as $p) {
-            if ($p->name == $request->path()) {
-                if ($p->read) {
-                    $hasPermission = true;
-                }
-            }
-        }
-        if ($hasPermission) {
-            return view('welcome');
-        }
-
-        return view('notfound');
-
+        abort_unless($user->role?->allows($request->path(), 'read'), 403);
+        return view('welcome');
     }
 
     // Traitement du logout
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/login');
     }
 
@@ -98,7 +83,7 @@ class AdminController extends Controller
                 Rule::unique('releveurs', 'serialNumber'),
                 'regex:/^R\d{3}$/',
             ],
-            'iconImage' => 'required',
+            'iconImage' => ['required', 'string', 'regex:/\A(?:[a-zA-Z0-9-]+\.(?:jpe?g|png)|demo-avatar\.svg)\z/'],
             'fullName' => [
                 'required',
                 Rule::unique('releveurs', 'fullName'),
@@ -162,7 +147,7 @@ class AdminController extends Controller
                 Rule::unique('releveurs', 'serialNumber')->ignore($request->id),
                 'regex:/^R\d{3}$/',
             ],
-            'iconImage' => 'required',
+            'iconImage' => ['required', 'string', 'regex:/\A(?:[a-zA-Z0-9-]+\.(?:jpe?g|png)|demo-avatar\.svg)\z/'],
             'fullName' => [
                 'required',
                 Rule::unique('releveurs', 'fullName')->ignore($request->id),
@@ -205,7 +190,7 @@ class AdminController extends Controller
 
     public function getReleveur(Request $request)
     {
-        return Releveur::orderBy('id', 'desc')->paginate($request->total);
+        return Releveur::orderBy('id', 'desc')->paginate($this->pageSize($request));
     }
     public function addPlan(Request $request)
     {
@@ -820,11 +805,11 @@ class AdminController extends Controller
 
     public function getPlan(Request $request)
     {
-        return RelevePlan::orderBy('id', 'desc')->paginate($request->total);
+        return RelevePlan::orderBy('id', 'desc')->paginate($this->pageSize($request));
     }
     public function getHistorique(Request $request)
     {
-        return Historique::orderBy('id', 'desc')->paginate($request->total);
+        return Historique::orderBy('id', 'desc')->paginate($this->pageSize($request));
     }
 
     public function upload(Request $request)
@@ -837,29 +822,64 @@ class AdminController extends Controller
         ];
 
         $this->validate($request, [
-            'file' => 'required|image|mimes:jpeg,jpg ,png'
+            'file' => 'required|image|mimes:jpeg,jpg,png|max:2048|dimensions:max_width=4096,max_height=4096'
         ], $messages);
-        $picName = time() . '.' . $request->file->extension();
-        $request->file->move(public_path('uploads'), $picName);
+        $picName = (string) \Illuminate\Support\Str::uuid().'.'.$request->file('file')->extension();
+        $request->file('file')->move(storage_path('app/private/releveurs'), $picName);
         return $picName;
+    }
+
+    public function image(string $filename)
+    {
+        if ($filename === 'demo-avatar.svg') {
+            return response()->file(resource_path('demo-avatar.svg'), ['Cache-Control' => 'private, no-store']);
+        }
+        abort_unless(preg_match('/\A[a-zA-Z0-9-]+\.(?:jpe?g|png)\z/', $filename), 404);
+        $path = storage_path('app/private/releveurs/'.$filename);
+        abort_unless(is_file($path) && !is_link($path), 404);
+        return response()->file($path, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function deleteImage(Request $request)
     {
-        $fileName = $request->imageName;
-        $this->deleteFileFromServer($fileName, false);
+        $data = $request->validate(['imageName' => ['required', 'string', 'regex:/\A[a-zA-Z0-9-]+\.(?:jpe?g|png)\z/']]);
+        abort_if(Releveur::where('iconImage', $data['imageName'])->exists(), 409, 'Image utilisée par un releveur.');
+        $this->deleteFileFromServer($data['imageName']);
         return 'done';
     }
-    public function deleteFileFromServer($fileName, $hasFullPath = false)
+
+    public function deleteFileFromServer($fileName)
     {
-        if (!$hasFullPath) {
-            $filePath = public_path() . '/uploads/' . $fileName;
+        if (!is_string($fileName) || !preg_match('/\A[a-zA-Z0-9-]+\.(?:jpe?g|png)\z/', $fileName)) {
+            return;
         }
-        if (file_exists($filePath)) {
-            @unlink($filePath);
+        $path = storage_path('app/private/releveurs/'.$fileName);
+        if (is_file($path) && !is_link($path)) {
+            unlink($path);
         }
-        return;
     }
+
+    private function pageSize(Request $request): int
+    {
+        $data = $request->validate(['total' => 'sometimes|integer|min:1|max:100']);
+        return (int) ($data['total'] ?? 15);
+    }
+
+    public function stats()
+    {
+        return response()->json([
+            'releveursCount' => Releveur::count(),
+            'planningsCount' => RelevePlan::count(),
+            'countAdmins' => User::where('userType', '!=', 'User')->count(),
+            'countUsers' => User::where('userType', 'User')->count(),
+        ]);
+    }
+
+    public function releveurOptions()
+    {
+        return Releveur::orderBy('serialNumber')->get(['serialNumber', 'fullName']);
+    }
+
     public function getReleveurCount()
     {
         $count = Releveur::count();
@@ -890,7 +910,7 @@ class AdminController extends Controller
 
             'email' => 'bail|required|email|unique:users',
             // bail means if required fails it chekcs the validaation 'email
-            'password' => 'bail|required|min:6',
+            'password' => 'bail|required|string|min:6',
             'role_id' => 'required',
         ], $messages);
 
@@ -945,8 +965,8 @@ class AdminController extends Controller
             ],
 
 
-            'email' => "bail|required|email|unique:users,email," . $request->id,
-            'password' => 'min:6',
+            'email' => ['bail', 'required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => 'nullable|string|min:8',
             'role_id' => 'required',
         ], $messages);
         // return 'done';
@@ -968,7 +988,7 @@ class AdminController extends Controller
 
     public function getUsers(Request $request)
     {
-        return User::orderBy('id', 'desc')->paginate($request->total);
+        return User::orderBy('id', 'desc')->paginate($this->pageSize($request));
     }
 
     public function deleteUser(Request $request)
@@ -999,11 +1019,12 @@ class AdminController extends Controller
         $this->validate($request, [
             'email' => 'bail|required|email',
             // bail means if required fails it chekcs the validaation 'email
-            'password' => 'bail|required|min:6',
+            'password' => 'bail|required|string|min:6',
         ], $messages);
 
         // this is the login process
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $request->session()->regenerate();
             $user = Auth::user();
             // if ($user->role->userType == 'User') {
             //     Auth::logout();
@@ -1043,7 +1064,7 @@ class AdminController extends Controller
 
     public function getRoles(Request $request)
     {
-        return Role::orderBy('id', 'desc')->paginate($request->total);
+        return Role::orderBy('id', 'desc')->paginate($this->pageSize($request));
     }
 
     public function editRole(Request $request)
@@ -1098,7 +1119,7 @@ class AdminController extends Controller
         ];
         $this->validate($request, [
             'id' => 'required',
-            'permission' => 'required',
+            'permission' => 'required|json',
         ], $messages);
         return Role::whereId($request->id)->update([
             'permission' => $request->permission,

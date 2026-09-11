@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="380" viewBox="0 0 520 380" role="img" aria-label="Compteurs eau et électricité">
+<rect x="20" y="20" width="480" height="340" rx="36" fill="#f0f6fc"/>
+<circle cx="260" cy="185" r="132" fill="#e1ecf8"/>
+<rect x="72" y="110" width="168" height="174" rx="22" fill="white" stroke="#c7d8e8" stroke-width="2"/>
+<rect x="280" y="110" width="168" height="174" rx="22" fill="white" stroke="#c7d8e8" stroke-width="2"/>
+<path d="M156 141c-12 18-29 34-29 50a29 29 0 0 0 58 0c0-16-17-32-29-50" fill="#168dc2"/>
+<path d="M370 139l-34 51h25l-6 36 39-55h-27z" fill="#e9ad31"/>
+<rect x="103" y="238" width="106" height="23" rx="5" fill="#e4eef6"/>
+<rect x="311" y="238" width="106" height="23" rx="5" fill="#e4eef6"/>
+<path d="M122 248h12m8 0h12m8 0h12m8 0h12m138 0h12m8 0h12m8 0h12m8 0h12" stroke="#356181" stroke-width="3"/>
+</svg>

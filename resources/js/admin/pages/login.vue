@@ -3,19 +3,20 @@
     <div class="row">
       <div class="col-md-6">
         <img
-          src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+          src="../../../images/login-illustration.svg"
           class="img-fluid"
-          alt="Sample image"
+          alt="Compteurs d’eau et d’électricité"
         />
       </div>
       <div class="col-md-6">
         <div class="login-form">
           <h1 class="text-center">Se connecter</h1>
-          <form>
+          <form @submit.prevent="login">
             <!-- Email input -->
             <div class="form-group">
               <label for="email">Adresse email</label>
               <input
+                autocomplete="username"
                 type="email"
                 id="email"
                 class="form-control"
@@ -28,6 +29,7 @@
             <div class="form-group">
               <label for="password">Mot de passe</label>
               <input
+                autocomplete="current-password"
                 type="password"
                 id="password"
                 class="form-control"
@@ -38,11 +40,10 @@
 
             <div class="text-center mt-4">
               <button
-                type="button"
+                type="submit"
                 class="btn btn-primary"
                 :disabled="isLogging"
                 :loading="isLogging"
-                @click="login"
               >
                 {{ isLogging ? "Logging..." : "Login" }}
               </button>

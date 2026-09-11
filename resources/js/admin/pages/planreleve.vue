@@ -375,43 +375,20 @@ export default {
                 "get",
                 `/app/get_plan?page=${page}&total=${this.total}`
             );
-            const res2 = await this.callApi("get", "/app/get_releveur");
+            const res2 = (this.isWritePermitted || this.isUpdatePermitted)
+                ? await this.callApi("get", "/app/releveur_options")
+                : { status: 200, data: [] };
             if (res.status == 200 && res2.status == 200) {
                 this.plans = res.data.data;
-                this.options = res2.data.data;
+                this.options = res2.data;
                 this.pageInfo = res.data;
             } else {
                 this.swr();
             }
         },
         async fetchData() {
-            try {
-                const releveurs = await this.callApi(
-                    "get",
-                    "/app/get_releveur"
-                );
-                const plannings = await this.callApi("get", "/app/get_plan");
-                const users = await this.callApi("get", "/app/get_users");
-
-                this.releveursCount = releveurs.data.data.length;
-                this.planningsCount = plannings.data.data.length;
-
-                let countAdmins = 0;
-                let countUsers = 0;
-
-                users.data.data.forEach((user) => {
-                    if (user.userType === "User") {
-                        countUsers++;
-                    } else {
-                        countAdmins++;
-                    }
-                });
-
-                this.countAdmins = countAdmins;
-                this.countUsers = countUsers;
-            } catch (error) {
-                console.error(error);
-            }
+            const res = await this.callApi('get', '/app/stats');
+            if (res.status === 200) Object.assign(this, res.data);
         },
 
         async addPlan() {
@@ -624,7 +601,7 @@ export default {
                 isDeleted: false,
             };
             this.$store.commit("setDeletingModalObj", deleteModalObj);
-            console.log("delete method called");
+
         },
 
         closeEditModal() {

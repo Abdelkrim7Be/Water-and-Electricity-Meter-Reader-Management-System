@@ -117,7 +117,7 @@
                                 >
                             </li>
                             <li>
-                                <a href="/logout"
+                                <a href="#" @click.prevent="logout"
                                     ><Icon
                                         type="ios-speedometer"
                                     />Déconnecter</a
@@ -157,6 +157,10 @@ export default {
     },
 
     methods: {
+        async logout() {
+            const res = await this.callApi('post', '/logout');
+            if (res.status === 200) window.location.href = '/login';
+        },
         close() {
             this.visible = false;
         },

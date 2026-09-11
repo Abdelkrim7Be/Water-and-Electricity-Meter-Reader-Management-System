@@ -16,7 +16,7 @@ export default {
                     data: dataObj,
                 });
             } catch (e) {
-                return e.response;
+                return e.response || { status: 0, data: { msg: 'Connexion indisponible.' } };
             }
         },
 
@@ -54,12 +54,9 @@ export default {
             });
         },
         checkUserPermission(key) {
-            let rawData;
             let isPermitted = false;
-            if (!this.userPermission) return true;
-            if (isProxy(this.userPermission)) {
-                rawData = toRaw(this.userPermission);
-            }
+            const rawData = toRaw(this.userPermission);
+            if (!Array.isArray(rawData)) return false;
             for (let d of rawData) {
                 // console.log(d.name);
                 // console.log(d[key]);
