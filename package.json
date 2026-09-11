@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "concurrently": "^8.2.2",
-        "view-ui-plus": "^1.3.12",
+        "view-ui-plus": "^1.3.24",
         "vuex": "^4.1.0"
     },
     "engines": {
