@@ -81,6 +81,8 @@ Les administrateurs peuvent consulter les relevés du mois en cours, gérer les 
 
 ## Installation
 
+Prérequis : PHP 8.1 ou 8.2 pour les dépendances verrouillées, Composer, Node.js/npm et MySQL. Le fichier `composer.lock` actuel contient des dépendances incompatibles avec PHP 8.3.
+
 1. Cloner le dépôt :
    ```bash
    git clone https://github.com/Abdelkrim7Be/Water-and-Electricity-Meter-Reader-Management-System.git
@@ -97,27 +99,43 @@ Les administrateurs peuvent consulter les relevés du mois en cours, gérer les 
    ```bash
    composer install
    ```
-4. Configurer les variables d'environnement (copier `.env.example` vers `.env` et adapter les accès base de données).
+4. Copier la configuration locale :
+   ```bash
+   cp .env.example .env
+   ```
+   Dans `.env`, utiliser `DB_DATABASE=releve` et les identifiants de votre serveur MySQL :
+   ```dotenv
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=releve
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+   Laisser `DB_PASSWORD` vide si MySQL n'a pas de mot de passe, ou mettre `DB_PASSWORD=root` si le mot de passe local est `root`.
+   Après une modification de `.env`, vider le cache de configuration avec `php artisan config:clear`.
 5. Générer la clé d'application :
    ```bash
    php artisan key:generate
    ```
-6. Importer la base de données : dupliquer `releve.sql.example` en `releve.sql` (données factices) et l'importer dans MySQL, ou utiliser votre propre jeu de données.
-7. Installer `concurrently` pour lancer frontend et backend en parallèle :
+6. Pour une nouvelle installation, créer une base vide et importer les données factices :
    ```bash
-   npm install -g concurrently
+   mysql -h 127.0.0.1 -u root -p -e "CREATE DATABASE releve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -h 127.0.0.1 -u root -p releve < releve.sql.example
    ```
-8. Compiler les assets et démarrer les serveurs de développement :
+   À l'invite, saisir le mot de passe MySQL (ou appuyer sur Entrée s'il est vide).
+   Ne pas importer ce fichier dans une base déjà utilisée. Les mots de passe des comptes d'exemple sont des valeurs factices : définir un mot de passe local avant de se connecter.
+7. Compiler les assets et démarrer Laravel (`concurrently` est déjà inclus dans les dépendances npm) :
    ```bash
    npm run dev
    ```
 
 ## Utilisation
 
-Une fois les serveurs lancés, l'application est accessible via votre navigateur :
+Ouvrir **http://localhost:8000**. Laravel sert aussi l'interface Vue.js ; `npm run dev` compile les assets avec Laravel Mix et démarre le serveur PHP.
 
-- Backend Laravel : `http://localhost:8000` (ou `http://127.0.0.1:8000`)
-- Frontend Vue.js : `http://localhost:8080`
+Pour recompiler automatiquement les assets pendant les modifications, lancer `npm run watch` dans un autre terminal.
+
+Si MySQL refuse la connexion, vérifier les mêmes identifiants avec `mysql -h 127.0.0.1 -u root -p`, puis corriger `.env` et exécuter `php artisan config:clear`.
 
 ## Licence
 
